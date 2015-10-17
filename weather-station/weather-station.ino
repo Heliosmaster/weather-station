@@ -75,7 +75,14 @@ PacketBuffer payload;   // temp buffer to send out
 
 LiquidCrystal lcd(7, 8, 9, 4, 5, 6);
 
+const int buttonPin = 17;
+const int ledLight = 16;
+MilliTimer lightTimer;
+
 void setup () {
+  pinMode(buttonPin, INPUT);
+  pinMode(ledLight, OUTPUT);
+  digitalWrite(ledLight, LOW);
   lcd.begin(16, 2);
   Serial.begin(57600);
   myId = rf12_config();
@@ -90,7 +97,13 @@ void setup () {
 }
 
 void loop () {
-
+  if (digitalRead(buttonPin) == HIGH) {
+    lightTimer.set(5000);
+    digitalWrite(ledLight, HIGH);
+  }
+  if (lightTimer.poll()){
+    digitalWrite(ledLight, LOW);
+  }
   if (rf12_recvDone() && rf12_crc == 0) {
     // a packet has been received
     for (byte i = 0; i < rf12_len; ++i)
